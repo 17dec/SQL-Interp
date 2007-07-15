@@ -1,6 +1,6 @@
 ---
 name: SQL-Interp
-version: 1.00
+version: 1.01
 author:
   - David Manura (http://math2.org/david/contact)
   - Mark Stosberg <mark@summersault.com>
@@ -24,7 +24,7 @@ provides:
     file: lib/DBIx/Interp.pm
   SQL::Interp:
     file: lib/SQL/Interp.pm
-    version: 1.00
+    version: 1.01
   SQL::Interp::SQL:
     file: lib/SQL/Interp.pm
   SQL::Interp::Variable:

@@ -1,6 +1,6 @@
 package SQL::Interp;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 use strict;
 use warnings;
@@ -782,6 +782,27 @@ See L<http://www.perl.com/perl/misc/Artistic.html>.
 
 =head1 See Also
 
+=head2 Fork
+
+This module was forked from L<SQL::Interpolate>, after the author of
+SQL::Interpolate was no longer heard from.  The core functionality remains
+unchanged, but the following  incompatible changes have been made:
+
+- The optional source filtering feature was removed.
+- The optional "macro" feature was removed.
+- A legacy, deprecated function "sql_literal" was removed.
+- The docs were overhauled to try to be simpler and clearer.
+
+So if you want those removed features, you should use SQL::Interpolate. I used
+it for years without those optional features and never missed them.
+
+Also, there were a few improvements to SQL::Interpolate which were never
+officially released in that name space because the author disappeared. So,
+SQL::Interp, also has the improvements from 0.33 to 0.40 in SQL::Interpolate.
+These were mostly made by the author or other contributors, and are expected to
+appear in the next official release of SQL::Interpolate, when and if that happens.
+
+
 =head2 Other modules in this distribution
 
 L<DBIx::Interp|DBIx::Interp> allows DBI methods to accept an
@@ -807,11 +828,8 @@ expressivity of the database query language.
 
 L<DBIx::Simple|DBIx::Simple> strives to simplify SQL generation as
 well as the data structures returned from
-L<DBI|DBI>. C<SQL::Interp> and the related modules don't try to
-handle C<DBI>'s results at all. C<DBIx::Simple> currently can use
-L<SQL::Abstract|SQL::Abstract> to help generate SQL, and it may be
-possible in the future for the same to be done with
-C<SQL::Interp>.
+L<DBI|DBI>. C<DBIx::Simple> currently can use
+L<SQL::Interp|SQL::Interp> to help generate SQL.
 
 =head3 Class::DBI
 
@@ -838,6 +856,12 @@ SQL::Interp but it is more rudimentary.  Both let you combine
 "chunks" of SQL that have their parameters attached to them and then
 transform it into an SQL string and list of bind parameters suitable
 for passing to DBI.
+
+=head3 SQL::KeywordSearch
+
+L<SQL::KeywordSearch|SQL::KeywordSearch> helps generate SQL for a keyword search.
+It can return the result in a format compatible with L<SQL::Interp> to become part
+of a larger query.
 
 =cut
 
