@@ -7,7 +7,7 @@ use Carp;
 use SQL::Interp ':all';
 use base qw(Exporter DBI);
 
-our $VERSION = '1.00';
+our $VERSION = '1.02';
 
 our @EXPORT;
 our %EXPORT_TAGS = (all => [qw(
