@@ -1,6 +1,8 @@
 
-1.02 2007-10-05
-    - No code changes, just a Makefile.PL improvement. Thanks to frag@ripco.com 	
+1.05 2007-11-15
+
+    - Support "NOT IN" with an empty list (Aristotle, test by Mark Stosberg, RT#30752)
+    - Support MySQL's "ON DUPLICATE KEY UPDATE", so it works like "SET". (Aristotle, RT#30652)
 
 1.01 2007-07-15
     - No code changes. Just some doc improvements.

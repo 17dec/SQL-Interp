@@ -1,6 +1,6 @@
 package SQL::Interp;
 
-our $VERSION = '1.02';
+our $VERSION = '1.05';
 
 use strict;
 use warnings;
@@ -163,11 +163,13 @@ sub _sql_interp {
             push @bind, @bind2;
         }
         elsif (ref $item) {
-            if ($sql =~ /\bIN\s*$/si) {
+            if ($sql =~ /\b(NOT\s+)?IN\s*$/si) {
+                my $not = quotemeta($1) || '';
                 $item = [ $$item ] if ref $item eq 'SCALAR';
                 if (ref $item eq 'ARRAY') {
                     if (@$item == 0) {
-                        $sql =~ s/$id_match\s+IN\s*$/1=0/si or croak 'ASSERT';
+                        my $dummy_expr = $not ? '1=1' : '1=0'; 
+                        $sql =~ s/$id_match\s+${not}IN\s*$/$dummy_expr/si or croak 'ASSERT';
                     }
                     else {
                         $sql .= " (" . join(', ', map {
@@ -179,7 +181,7 @@ sub _sql_interp {
                     _error_item($idx, \@items);
                 }
             }
-            elsif ($sql =~ /\bSET\s*$/si && ref $item eq 'HASH') {
+            elsif ($sql =~ /\b(?:ON\s+DUPLICATE\s+KEY\s+UPDATE|SET)\s*$/si && ref $item eq 'HASH') {
                 _error('Hash has zero elements.') if keys %$item == 0;
                 $sql .= " " . join(', ', map {
                     my $key = $_;
@@ -575,6 +577,9 @@ arrayref.
   IN:  'WHERE x IN', []
   OUT: 'WHERE 1=0'                              
 
+  IN:  'WHERE x NOT IN', []
+  OUT: 'WHERE 1=1'                              
+
 =head3 Context ('INSERT INTO tablename', $x)
 
   IN:  'INSERT INTO mytable', $href
@@ -591,6 +596,7 @@ arrayref.
   IN:  'UPDATE mytable SET', $href
   OUT: 'UPDATE mytable SET m = ?, n = ?', $href->{m}, $href->{n}
 
+MySQL's "ON DUPLICATE KEY UPDATE" is supported the same way.
 
 =head3 Context ('FROM | JOIN', $x)
 

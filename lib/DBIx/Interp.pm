@@ -3,11 +3,10 @@ package DBIx::Interp;
 use strict;
 use warnings;
 use Carp;
-#use DBI;
 use SQL::Interp ':all';
 use base qw(Exporter DBI);
 
-our $VERSION = '1.02';
+our $VERSION = '1.05';
 
 our @EXPORT;
 our %EXPORT_TAGS = (all => [qw(
@@ -333,24 +332,6 @@ sub selectcol_arrayref_i {
         return \@col;
     };
 }
-
-#old: sub _do_execute {
-#    my ($sth, @bind) = @_;
-#    if (ref($bind[0]) eq 'ARRAY') {
-#        _bind_params($sth, @bind);
-#        return $sth->execute();
-#    }
-#    else {
-#        return $sth->execute(@bind);
-#    }
-#}
-#old: sub _bind_params {
-#    my ($sth, @bind) = @_;
-#    my $num = 1;
-#    for my $val (@bind) {
-#        $sth->bind_param($num++, $val->[0], $val->[1]->{type});
-#    }
-#}
 
 1;
 

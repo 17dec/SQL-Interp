@@ -141,6 +141,12 @@ interp_test(['WHERE field IN', sql($x)],
 interp_test(['WHERE field IN', $v0],
             ['WHERE 1=0'],
             'IN arrayref of size = 0');
+
+interp_test(['WHERE field NOT IN', $v0],
+            ['WHERE 1=1'],
+            'NOT IN arrayref of size = 0');
+
+
 interp_test(['WHERE field IN', $v],
             ['WHERE field IN (?, ?)', @$v],
             'IN arrayref of size > 0');

@@ -1,10 +1,35 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         SQL-Interp
-version:      1.02
-version_from: lib/SQL/Interp.pm
-installdirs:  site
+---
+name: SQL-Interp
+version: 1.05
+author:
+  - David Manura (http://math2.org/david/contact)
+  - 'Mark Stosberg <mark@summersault.com>'
+abstract: Interpolate Perl variables into SQL statements
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
 requires:
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.30_01
+  DBI: 1
+recommends:
+  Filter::Simple: 0
+  Scalar::Util: 0
+  Text::Balanced: 1.87
+provides:
+  DBIx::Interp:
+    file: lib/DBIx/Interp.pm
+    version: 1.05
+  DBIx::Interp::STX:
+    file: lib/DBIx/Interp.pm
+  DBIx::Interp::db:
+    file: lib/DBIx/Interp.pm
+  SQL::Interp:
+    file: lib/SQL/Interp.pm
+    version: 1.05
+  SQL::Interp::SQL:
+    file: lib/SQL/Interp.pm
+  SQL::Interp::Variable:
+    file: lib/SQL/Interp.pm
+generated_by: Module::Build version 0.2806
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
