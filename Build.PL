@@ -11,5 +11,6 @@ Module::Build->new(
         Filter::Simple => 0,
         Scalar::Util   => 0
     },
+    create_makefile_pl  => 'traditional',
     dist_author => [ 'David Manura (http://math2.org/david/contact)' , 'Mark Stosberg <mark@summersault.com>' ],
 )->create_build_script();

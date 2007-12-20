@@ -1,4 +1,10 @@
 
+1.06 2007-12-20
+
+    [INTERNALS]
+    - Fix warnings introduced in 1.05
+    - Fix Build.PL to create Makefile.PL
+
 1.05 2007-11-15
 
     - Support "NOT IN" with an empty list (Aristotle, test by Mark Stosberg, RT#30752)

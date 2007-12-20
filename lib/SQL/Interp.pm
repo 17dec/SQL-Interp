@@ -1,6 +1,6 @@
 package SQL::Interp;
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 use strict;
 use warnings;
@@ -164,7 +164,8 @@ sub _sql_interp {
         }
         elsif (ref $item) {
             if ($sql =~ /\b(NOT\s+)?IN\s*$/si) {
-                my $not = quotemeta($1) || '';
+                my $not = quotemeta($1 || '');
+
                 $item = [ $$item ] if ref $item eq 'SCALAR';
                 if (ref $item eq 'ARRAY') {
                     if (@$item == 0) {
