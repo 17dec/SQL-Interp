@@ -1,6 +1,6 @@
 package SQL::Interp;
 
-our $VERSION = '1.06';
+our $VERSION = '1.10';
 
 use strict;
 use warnings;
@@ -167,6 +167,10 @@ sub _sql_interp {
                 my $not = quotemeta($1 || '');
 
                 $item = [ $$item ] if ref $item eq 'SCALAR';
+
+                # allow double references
+                $item = $$item if ref $item eq 'REF' ;
+
                 if (ref $item eq 'ARRAY') {
                     if (@$item == 0) {
                         my $dummy_expr = $not ? '1=1' : '1=0'; 
@@ -189,9 +193,9 @@ sub _sql_interp {
                     my $val = $item->{$key};
                     "$key=" .
                         _sql_interp_data($val);
-                } keys %$item);
+                } (sort keys %$item));
             }
-            elsif ($sql =~ /\bINSERT[\w\s]*\sINTO\s*$id_match\s*$/si) {
+            elsif ($sql =~ /\b(REPLACE|INSERT)[\w\s]*\sINTO\s*$id_match\s*$/si) {
                 $item = [ $$item ] if ref $item eq 'SCALAR';
                 if (ref $item eq 'ARRAY') {
                     $sql .= " VALUES(" . join(', ', map {
@@ -199,11 +203,12 @@ sub _sql_interp {
                     } @$item) . ")";
                 }
                 elsif (ref $item eq 'HASH') {
+                    my @keyseq = sort keys %$item;
                     $sql .=
-                        " (" . join(', ', keys %$item) . ")" .
+                        " (" . join(', ', @keyseq) . ")" .
                         " VALUES(" . join(', ', map {
-                            _sql_interp_data($_);
-                        } values %$item) . ")";
+                            _sql_interp_data($item->{$_});
+                        } @keyseq) . ")";
                 }
                 else { _error_item($idx, \@items); }
             }
@@ -248,7 +253,7 @@ sub _sql_interp {
                             "$key=" .
                             _sql_interp_data($val);
                         }
-                    } keys %$item;
+                    } (sort keys %$item);
                     $s = "($s)" if keys %$item > 1;
                     $s = " $s";
                     $sql .= $s;
@@ -350,7 +355,7 @@ sub _sql_interp_resultset {
                         my $sql3 = _sql_interp_data($val);
                         $sql3 .= " AS $key" if $is_first_row;
                         $sql3;
-                    } keys %$first_row);
+                    } (sort keys %$first_row));
              }
         }
         else {
@@ -518,7 +523,7 @@ The following variable names will be used in the below examples:
 
  $sref  = \3;                      # scalarref
  $aref  = [1, 2];                  # arrayref 
- $hashref  = {m => 1, n => undef}; # hashref
+ $href  = {m => 1, n => undef};    # hashref
  $hv = {v => $v, s => $$s};        # hashref containing arrayref
  $vv = [$v, $v];                   # arrayref of arrayref
  $vh = [$h, $h];                   # arrayref of hashref
@@ -592,6 +597,8 @@ arrayref.
   IN:  'INSERT INTO mytable', $sref
   OUT: 'INSERT INTO mytable VALUES(?)', $$sref; 
 
+MySQL's "REPLACE INTO" is supported the same way.
+
 =head3 Context ('SET', $x)
 
   IN:  'UPDATE mytable SET', $href
@@ -635,7 +642,7 @@ that transparently caches statement handles.
      if (! defined $sth || $sth->{Statement} ne $sql) {
          $sth = $dbh->prepare($sql);
      }
-     $sth->execute(@list);
+     $sth->execute(@bind);
      $sth->fetchall_arrayref();
   }
 
@@ -791,24 +798,32 @@ See L<http://www.perl.com/perl/misc/Artistic.html>.
 
 =head2 Fork
 
-This module was forked from L<SQL::Interpolate>, after the author of
-SQL::Interpolate was no longer heard from.  The core functionality remains
-unchanged, but the following  incompatible changes have been made:
+This module was forked from L<SQL::Interpolate>, around version 0.40.  The core
+functionality remains unchanged, but the following  incompatible changes have
+been made:
 
-- The optional source filtering feature was removed.
-- The optional "macro" feature was removed.
-- A legacy, deprecated function "sql_literal" was removed.
-- The docs were overhauled to try to be simpler and clearer.
+=over 4
 
-So if you want those removed features, you should use SQL::Interpolate. I used
-it for years without those optional features and never missed them.
+=item *
 
-Also, there were a few improvements to SQL::Interpolate which were never
-officially released in that name space because the author disappeared. So,
-SQL::Interp, also has the improvements from 0.33 to 0.40 in SQL::Interpolate.
-These were mostly made by the author or other contributors, and are expected to
-appear in the next official release of SQL::Interpolate, when and if that happens.
+The optional source filtering feature was removed.
 
+=item *
+
+The optional "macro" feature was removed.
+
+=item *
+
+A legacy, deprecated function "sql_literal" was removed.
+
+=item *
+
+The docs were overhauled to be simpler and clearer.
+
+=back
+
+So if you want those removed features, you should use L<SQL::Interpolate>. I
+used it for years without those optional features and never missed them.
 
 =head2 Other modules in this distribution
 

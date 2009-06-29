@@ -5,6 +5,8 @@ Module::Build->new(
     license => 'perl',
     requires => {
         DBI   => 1.00,
+        # There were test failures on 5.5 and 5.6. Patches welcome to resolve them
+        perl  => '5.8.0',
     },
     recommends => {
         Text::Balanced => '1.87',

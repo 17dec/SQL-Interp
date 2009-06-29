@@ -1,4 +1,41 @@
 
+A future release:
+
+    - If you like SQL::Interp, please consider supporting the project by adding support
+      for the 'quote_char' and 'name_sep' options. SQL::Abstract has code that can be
+      borrowed for this. See this bug report for details:
+      http://rt.cpan.org/Public/Bug/Display.html?id=31488
+
+    - If you use SQL::Interp with PostgreSQL and are interested in a further
+      performance improvement, considering working on this optimization: 
+        "RT#39778: wish: optimize IN() to be ANY() for compatible PostgreSQL versions": 
+         https://rt.cpan.org/Ticket/Display.html?id=39778
+
+1.10 2009-06-28
+
+    [FEATURES]
+    - Add support for MySQL's "REPLACE INTO". (TBONE, Mark Stosberg, RT#43477)
+
+    [PERFORMANCE]
+    - When SQL snippets are provided as hashrefs, we now always sort them to
+      insure consistent results for the benefit of possible statement caching.
+      This shouldn't change your application behavior, as hashs are not to be
+      considered an ordered data structure. If you want to force an element to
+      be first in the where clause, that's better done with the pre-existing
+      functionality:
+          sql_interp("... WHERE a = 1 AND ",\%rest_of_where_hash);
+
+      Thanks to Andrew Kirkpatrick for the patch (RT#33310).
+
+    [BUG FIXES]
+    - The documentation said that we supported a reference to an arrayref in 
+      the "IN ()" context, but there didn't appear to be code or tests for this.
+      Both have been added now. (Mark Stosberg, RT#39336).
+
+    [INTERNALS]
+    - Update formatting and language about the historical fork with SQL::Interpolate.
+    - Fix documentation typos (TBONE, RT#42726, RT#42733, RT#42336)
+
 1.06 2007-12-20
 
     [INTERNALS]

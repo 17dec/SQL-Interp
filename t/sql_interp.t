@@ -93,6 +93,9 @@ interp_test([sql(sql(),sql())],
 interp_test(['INSERT INTO mytable', \$x],
             ['INSERT INTO mytable VALUES(?)', $x],
             'INSERT scalarref');
+interp_test(['REPLACE INTO mytable', \$x],
+            ['REPLACE INTO mytable VALUES(?)', $x],
+            'REPLACE INTO');
 interp_test(['INSERT INTO mytable', sql($x)],
             ["INSERT INTO mytable $x"], # invalid
             'INSERT sql(...)');
@@ -118,8 +121,8 @@ interp_test(['INSERT INTO mytable', $h],
                  @{$hi->{values}}],
             'INSERT hashref of size > 0');
 interp_test(['INSERT INTO mytable', $h2i->{hashref}],
-            ["INSERT INTO mytable ($h2i->{keys}[0], $h2i->{keys}[1], $h2i->{keys}[2]) " .
-             "VALUES($h2i->{places}->[0], $h2i->{places}->[1],  $h2i->{places}->[2])",
+            ["INSERT INTO mytable ($h2i->{keys}[1], $h2i->{keys}[0], $h2i->{keys}[2]) " .
+             "VALUES($h2i->{places}->[1], $h2i->{places}->[0],  $h2i->{places}->[2])",
              @{$h2i->{binds}}],
             'INSERT hashref of sql_type + sql()');
 interp_test(['INSERT INTO mytable', {one => 1, two => sql(\$x, '*', \$x)}],
@@ -135,6 +138,12 @@ interp_test(['INSERT HIGH_PRIORITY IGNORE INTO mytable', $v],
 interp_test(['WHERE field IN', \$x],
             ['WHERE field IN (?)', $x],
             'IN scalarref');
+
+my $maybe_array = [1,2];
+interp_test(['WHERE field IN', \$maybe_array],
+            ['WHERE field IN (?, ?)', @$maybe_array],
+            'IN maybe_array turns out to be an array');
+
 interp_test(['WHERE field IN', sql($x)],
             ["WHERE field IN $x"], # invalid
             'IN sql()');
@@ -175,7 +184,7 @@ interp_test(['UPDATE mytable SET', $h],
             'SET hashref');
 interp_test(['UPDATE mytable SET',
                 {one => 1, two => $var2, three => sql('3')}],
-            ['UPDATE mytable SET three=3, one=?, two= ?',
+            ['UPDATE mytable SET one=?, three=3, two= ?',
                 [1, sql_type(\1)], [${$var2->{value}}, $var2]],
             'SET hashref of sql_type types, sql()');
 #FIX--what if size of hash is zero? error?
@@ -193,7 +202,7 @@ my $h2bi = make_hash_info(
     {x => [1]}
 );
 interp_test(['WHERE', $h2bi->{hashref}],
-            ["WHERE ($h2bi->{places}[0] AND $h2bi->{places}[1])", @{$h2bi->{binds}}],
+            ["WHERE ($h2bi->{places}[1] AND $h2bi->{places}[0])", @{$h2bi->{binds}}],
             'WHERE hashref sql()');
 my $h2ci = make_hash_info(
     {x => 1, y => undef},
@@ -201,7 +210,7 @@ my $h2ci = make_hash_info(
     {x => [1]}
 );
 interp_test(['WHERE', $h2ci->{hashref}],
-            ["WHERE ($h2ci->{places}[0] AND $h2ci->{places}[1])", @{$h2ci->{binds}}],
+            ["WHERE ($h2ci->{places}[1] AND $h2ci->{places}[0])", @{$h2ci->{binds}}],
             'WHERE hashref of NULL');
 
 # WHERE x=
@@ -217,8 +226,8 @@ interp_test(['WHERE x=', \$x, 'AND', 'y=', $var2],
             ['WHERE x= ? AND y= ?', [$x, sql_type(\$x)], [${$var2->{value}}, $var2]],
             'WHERE \$x, sql_type typed');
 interp_test(['WHERE', {x => $x, y => $var2}, 'AND z=', \$x],
-            ['WHERE (y= ? AND x=?) AND z= ?',
-                [${$var2->{value}}, $var2], [$x, sql_type(\$x)], [$x, sql_type(\$x)]],
+            ['WHERE (x=? AND y= ?) AND z= ?',
+                [$x, sql_type(\$x)], [${$var2->{value}}, $var2], [$x, sql_type(\$x)]],
             'WHERE hashref of \$x, sql_type typed');
 my $h5i = make_hash_info(
     {x => $x, y => [3, $var2]},
@@ -226,10 +235,10 @@ my $h5i = make_hash_info(
     {x => [[$x, sql_type(\$x)]], y => [[3, sql_type(\3)], [${$var2->{value}}, $var2]]}
 );
 interp_test(['WHERE', $h5i->{hashref}],
-            ["WHERE ($h5i->{places}[0] AND $h5i->{places}[1])", @{$h5i->{binds}}],
+            ["WHERE ($h5i->{places}[1] AND $h5i->{places}[0])", @{$h5i->{binds}}[2,0,1]],
             'WHERE hashref of arrayref of sql_type typed');
 interp_test(['WHERE', {x => $x, y => sql('z')}],
-            ['WHERE (y=z AND x=?)', $x],
+            ['WHERE (x=? AND y=z)', $x],
             'WHERE hashref of \$x, sql()');
 
 # table references

@@ -6,7 +6,7 @@ use Carp;
 use SQL::Interp ':all';
 use base qw(Exporter DBI);
 
-our $VERSION = '1.06';
+our $VERSION = '1.10';
 
 our @EXPORT;
 our %EXPORT_TAGS = (all => [qw(
@@ -525,7 +525,7 @@ methods.
 
 =item C<new> (static method)
 
- my $dbx = DBX::Interpolate->new($db, %params);
+ my $dbx = DBIx::Interp->new($db, %params);
 
 Creates a new object, creating or attaching a DBI handle.
 

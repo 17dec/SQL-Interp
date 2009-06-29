@@ -4,6 +4,7 @@
 use strict;
 use SQL::Interp qw(:all);
 use Data::Dumper;
+use Carp;
 
 #our $fake_mysql_dbh =
 #    bless {Driver => {Name => 'mysql'}}, 'DBI::db';
@@ -30,7 +31,7 @@ sub my_deeply
     local $SIG{__WARN__} = sub {
         warn $_[0] if $_[0] !~ /isn't numeric in numeric eq/;
     };
-    is_deeply(@_) or print STDERR Dumper(@_);
+    is_deeply(@_) or carp Dumper(@_);
 }
 
 1
