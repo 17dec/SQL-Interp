@@ -12,5 +12,6 @@ t/dbi.t
 t/dist.t
 t/pod.t
 t/sql_interp.t
+t/strict_mode.t
 t/lib/DBD/Mock.pm
 META.yml

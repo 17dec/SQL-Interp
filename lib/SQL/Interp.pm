@@ -10,6 +10,7 @@ use base 'Exporter';
 our @EXPORT;
 our %EXPORT_TAGS = (all => [qw(
     sql_interp
+    sql_interp_strict
     sql_type
     sql
 )]); 
@@ -136,6 +137,30 @@ sub sql_interp {
                          . join(':', @bind) . "]\n";
 
     return ($sql, @bind);
+}
+
+# Prevent accidental SQL injection holes
+# By enforcing the rule that two non-references cannot be used
+# in a row. If you really mean that, concatanate the strings instead.
+sub sql_interp_strict {
+    my @items = @_;
+
+    my $adjacent_string_cnt = 0;
+    for my $item (@items) {
+        # If we have a reference, reset the counter and move to the next element.
+        if (ref $item) {
+            $adjacent_string_cnt = 0;
+        }
+        else { 
+            $adjacent_string_cnt++;
+            if ($adjacent_string_cnt == 2) {
+                croak "failed sql_interp_strict check. Refactor to concatenate adjacent strings in sql_interp array";
+            }
+        }
+
+    }
+
+    return sql_interp(@_);
 }
 
 # helper called by sql_interp()
@@ -661,6 +686,34 @@ of binding values.
 In contrast, any scalar values I<inside> an arrayref or hashref are by
 default treated as binding variables, not SQL.  The contained
 elements may be also be L<sql_type()> or L<sql()>.
+
+=head1 Security: sql_interp_strict
+
+The C<< sql_interp >> function has a security weakness. Consider these two
+statements, one easily a typo of the other:
+
+    sql_interp("SELECT * FROM foo WHERE a = ",\$b)
+    sql_interp("SELECT * FROM foo WHERE a = ",$b)
+
+Both would produce valid SQL, but the first would be secure due to use of bind
+variables, while the second is potentially insecure, because C<< $b >> is added
+directly to the SQL statement. If C<< $b >> contains a malicious value, it
+could be used for a SQL injection attack.
+
+To prevent this accident, we also supply C<< sql_interp_strict() >>, which
+works exactly the same as sql_interp(), but with an additional check that B<
+two non-references never appear in a row >. If they do, an exception will be
+thrown.
+
+This does mean some previously safe-but-valid SQL be need to be rewritten, such
+as when you are building a complex query from pieces. Here's a contrived example:
+
+    sql_interp("SELECT * FROM ","foo","WHERE a = ",\$b);
+
+To work under strict mode, you need to concatenate the strings instead:
+
+    sql_interp("SELECT * FROM "."foo"."WHERE a = ",\$b);
+
 
 =head1 A Couple Helper Functions You Sometimes Need
 
