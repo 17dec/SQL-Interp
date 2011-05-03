@@ -21,12 +21,23 @@ A future release:
     - Add sql_interp_strict() as a first stab at an API for adding a strict mode. 
     - Switched to using Sub::Exporter and Exporter. This allows you to do this:
 
-      use SQL::Interp 'sql_interp_strict' { -as => 'sql_interp' };
+      use SQL::Interp 'sql_interp_strict' => { -as => 'sql_interp' };
 
       So that strict mode is enabled throughout your code. Before you do that,
       read the docs on sql_interp_strict-- some of your code may need to be
       refactored for it work, so you may want to start with the incremental
       approach.
+
+      While sql_interp() will work as before for backwards compatibility, you
+      can do this to rename them on import now:
+
+      use SQL::Interp
+         'sql_interp'        => { -as => 'sql_interp_insecure' },
+         'sql_interp_strict' => { -as => 'sql_interp' };
+
+      If you would like a shortcut for this in the form of SQL::Interp::Strict,
+      let me know. 
+
 
 1.10 2009-06-28
 
