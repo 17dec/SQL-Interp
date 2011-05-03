@@ -1,20 +1,17 @@
 package SQL::Interp;
 
-our $VERSION = '1.10';
+our $VERSION = '1.11';
 
 use strict;
 use warnings;
 use Carp;
-use base 'Exporter';
+use Sub::Exporter -setup => {
+    exports => [ qw{  sql_interp
+                      sql_interp_strict
+                      sql_type
+                      sql } ],
+};
 
-our @EXPORT;
-our %EXPORT_TAGS = (all => [qw(
-    sql_interp
-    sql_interp_strict
-    sql_type
-    sql
-)]); 
-our @EXPORT_OK = @{ $EXPORT_TAGS{all} };
 
 # whether TRACE_SQL is enabled
 my $trace_sql_enabled = $ENV{TRACE_SQL} || 0;
@@ -48,33 +45,6 @@ my $state = undef;
 # bind elements in interpolation
 # [local to sql_interp functions]
 my @bind;
-
-sub import {
-    my $class  = shift;
-    my @params = @_;
-
-    # process any special "use" parameters
-    my $is_wrapped     = 0;  # whether module wrapped
-                             #   (e.g. by DBIx::Interp)
-    my %action_for = (
-        TRACE_SQL    => sub { $trace_sql_enabled = shift @params;
-                              print STDERR "TRACE_SQL enabled\n"
-                                  if $trace_sql_enabled; },
-        __WRAP       => sub { $is_wrapped = shift @params; }
-    );
-    @_ = ($class);  # unprocessed params
-    while (my $item = shift @params) {
-        my $action = $action_for{$item};
-        if ($action) { $action->(); }
-        else         { push @_, $item; }
-    }
-
-    # handle exports
-    my $level = $is_wrapped ? 2 : 1;
-    __PACKAGE__->export_to_level($level, @_);
-
-    return;
-}
 
 # only used by DBIx::Interp, so not further documented here
 sub new {
@@ -414,14 +384,6 @@ sub _error_item {
 
 sub _error {
     croak "SQL::Interp error: $_[0]";
-}
-
-# This shall only be called by DBIx::Interp.
-sub _use_params {
-    scalar(caller()) eq 'DBIx::Interp' or die 'ASSERT';
-
-    # supported use parameters.
-    return qw(TRACE_SQL);
 }
 
 1;
@@ -774,15 +736,11 @@ you can set the environment variable C<TRACE_SQL> to "1"
 
  TRACE_SQL=1 perl my_script.pl
 
-Alternatively, you can do this:
-
- use SQL::Interp TRACE_SQL => 1;
-
 Here's some example output:
 
  DEBUG:interp[sql=INSERT INTO mytable VALUES(?),bind=5]
 
-=head1 Philosophy 
+=head1 Philosophy
 
 B<The query language is SQL>.  There are other modules, such as
 L<SQL::Abstract|SQL::Abstract>, that hide SQL behind method calls and/or Perl
@@ -804,13 +762,13 @@ load some meaning into "{, "[" and "\", but we try to limit its use to obvious
 cases.  Since your raw SQL is exposed, you can use your particular dialect of
 SQL.  
 
-=head1 Limitations 
+=head1 Limitations
 
 Some types of interpolation are context-sensitive and involve examination of
 your SQL fragments.  The examination could fail on obscure syntax, but it is
 generally robust.  Look at the examples to see the types of interpolation that
 are accepted, and if doubt, examine the SQL output yourself with the TRACE_SQL
-option.  If needed, you can disable context sensitivity by inserting a
+environment variable set.  If needed, you can disable context sensitivity by inserting a
 null-string before a variable.
  
  "SET", "", \$x

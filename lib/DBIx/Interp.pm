@@ -4,51 +4,21 @@ use strict;
 use warnings;
 use Carp;
 use SQL::Interp ':all';
-use base qw(Exporter DBI);
+use base 'DBI';
+use Sub::Exporter -setup => {
+    exports => [
+        qw{attr dbi_interp key_field},
+        qw{  sql_interp
+             sql_interp_strict
+             sql_type
+             sql },
+    ],
+};
 
-our $VERSION = '1.10';
-
-our @EXPORT;
-our %EXPORT_TAGS = (all => [qw(
-    attr
-    dbi_interp
-    key_field
-)]);
-our @EXPORT_OK = @{$EXPORT_TAGS{all}};
+our $VERSION = '1.11';
 
 our @CARP_NOT =
     qw(DBIx::Interp DBIx::Interp::db DBIx::Interp::STX);
-
-sub _wrap(&);
-
-sub import {
-    my @params = @_;
-
-    # handle local exports
-    my @params2 = _wrap_params($SQL::Interp::EXPORT_TAGS{all},
-                                [SQL::Interp::_use_params()], @params);
-    __PACKAGE__->export_to_level(1, @params2);
-
-    # pass use parameters to wrapped module.
-    @_ = _wrap_params($EXPORT_TAGS{all}, [], @params);
-    push @_, __WRAP => 1;
-    goto &SQL::Interp::import; # @_
-}
-
-# internal helper function to mangle "use" parameters for a wrapper
-# called only by import().
-sub _wrap_params {
-    my ($skip_names, $skip_keys, @parts) = @_;
-    my @out;
-    my %skip_names = map {($_=>1)} @$skip_names;
-    my %skip_keys  = map {($_=>1)} @$skip_keys;
-    while (@parts) {
-        if    ($skip_names{$parts[0]}) { shift @parts; }
-        elsif ( $skip_keys{$parts[0]}) { shift @parts; shift @parts; }
-        else                           { push @out, shift @parts; }
-    }
-    return @out;
-}
 
 sub key_field {
     my $key = shift;
