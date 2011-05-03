@@ -121,7 +121,7 @@ sub sql_interp_strict {
         if (ref $item) {
             $adjacent_string_cnt = 0;
         }
-        else { 
+        else {
             $adjacent_string_cnt++;
             if ($adjacent_string_cnt == 2) {
                 croak "failed sql_interp_strict check. Refactor to concatenate adjacent strings in sql_interp array";
@@ -134,7 +134,7 @@ sub sql_interp_strict {
 }
 
 # helper called by sql_interp()
-# @items - interpolation list 
+# @items - interpolation list
 sub _sql_interp {
     my (@items) = @_;
 
@@ -168,7 +168,7 @@ sub _sql_interp {
 
                 if (ref $item eq 'ARRAY') {
                     if (@$item == 0) {
-                        my $dummy_expr = $not ? '1=1' : '1=0'; 
+                        my $dummy_expr = $not ? '1=1' : '1=0';
                         $sql =~ s/$id_match\s+${not}IN\s*$/$dummy_expr/si or croak 'ASSERT';
                     }
                     else {
@@ -449,18 +449,18 @@ SQL::Interp - Interpolate Perl variables into SQL statements
   my ($sql, @bind) = sql_interp 'INSERT INTO table', \%item;
   my ($sql, @bind) = sql_interp 'UPDATE table SET',  \%item, 'WHERE y <> ', \2;
   my ($sql, @bind) = sql_interp 'DELETE FROM table WHERE y = ', \2;
-  
+
   # These two select syntax produce the same result
   my ($sql, @bind) = sql_interp 'SELECT * FROM table WHERE x = ', \$s, 'AND y IN', \@v;
   my ($sql, @bind) = sql_interp 'SELECT * FROM table WHERE', {x => $s, y => \@v};
-  
+
 
 =head1 DESCRIPTION
 
 SQL::Interp converts a list of intermixed SQL fragments and variable references
 into a conventional SQL string and I<list of bind values> suitable for passing
 onto DBI. This simple technique creates database calls that are simpler to create and
-easier to read, while still giving you full access to custom SQL. 
+easier to read, while still giving you full access to custom SQL.
 
 SQL::Interp properly binds or escapes variables.  This recommended practice
 safeguards against "SQL injection" attacks. The L<DBI|DBI> documentation has
@@ -468,7 +468,7 @@ several links on the topic.
 
 Besides the simple techniques shown above, The SQL-Interpolate distribution includes
 the optional L<DBIx::Interp|DBIx::Interp> module, which integrates with DBI:
-  
+
   use DBIx::Interp ':all';
   ...
   my $rows = $dbx->selectall_arrayref("
@@ -477,14 +477,14 @@ the optional L<DBIx::Interp|DBIx::Interp> module, which integrates with DBI:
           WHERE date > ",\$x," AND subject IN ",\@subjects
    );
 
-Since DBIx::Interp still allows you complete access to the DBI API, using it  
+Since DBIx::Interp still allows you complete access to the DBI API, using it
 as wrapper is recommended for most applications.
 
 =head1 The One Function You Really Need
 
 =head2 C<sql_interp>
 
-  ($sql, @bind) = sql_interp @params;    
+  ($sql, @bind) = sql_interp @params;
 
 C<sql_interp()> is the one central function you need to know. C<sql_interp()>
 strings together the given list of elements  and returns both an SQL string ($sql) with
@@ -509,13 +509,13 @@ B<Interpolation Examples>
 The following variable names will be used in the below examples:
 
  $sref  = \3;                      # scalarref
- $aref  = [1, 2];                  # arrayref 
+ $aref  = [1, 2];                  # arrayref
  $href  = {m => 1, n => undef};    # hashref
  $hv = {v => $v, s => $$s};        # hashref containing arrayref
  $vv = [$v, $v];                   # arrayref of arrayref
  $vh = [$h, $h];                   # arrayref of hashref
 
- Let $x stand for any of these. 
+ Let $x stand for any of these.
 
 =head3 Default scalarref behavior
 
@@ -529,24 +529,24 @@ A scalarref becomes a single bind value.
 A hashref becomes a logical AND
 
   IN:  'WHERE', $href
-  OUT: 'WHERE (m=? AND n IS NULL)', $h->{m},  
+  OUT: 'WHERE (m=? AND n IS NULL)', $h->{m},
 
   IN:  'WHERE', $hv
-  OUT: 'WHERE (v IN (?, ?) AND s = ?)', @$v, $$s 
+  OUT: 'WHERE (v IN (?, ?) AND s = ?)', @$v, $$s
 
 =head3 Default arrayref of (hashref or arrayref) behavior
 
-I<This is not commonly used.> 
+I<This is not commonly used.>
 
   IN:  $vv
   OUT: '(SELECT ?, ? UNION ALL SELECT ?, ?)',
-          map {@$_} @$v                           
+          map {@$_} @$v
 
   IN:  $vh
   OUT: '(SELECT ? as m, ? as n UNION ALL
             SELECT ?, ?)',
           $vh->[0]->{m}, $vh->[0]->{n},
-          $vh->[1]->{m}, $vh->[1]->{n}            
+          $vh->[1]->{m}, $vh->[1]->{n}
 
   # Typical usage:
   IN: $x
@@ -568,10 +568,10 @@ arrayref.
   OUT: 'WHERE x IN (?)', $$sref
 
   IN:  'WHERE x IN', []
-  OUT: 'WHERE 1=0'                              
+  OUT: 'WHERE 1=0'
 
   IN:  'WHERE x NOT IN', []
-  OUT: 'WHERE 1=1'                              
+  OUT: 'WHERE 1=1'
 
 =head3 Context ('INSERT INTO tablename', $x)
 
@@ -579,10 +579,10 @@ arrayref.
   OUT: 'INSERT INTO mytable (m, n) VALUES(?, ?)', $href->{m}, $href->{n}
 
   IN:  'INSERT INTO mytable', $aref
-  OUT: 'INSERT INTO mytable VALUES(?, ?)', @$aref; 
+  OUT: 'INSERT INTO mytable VALUES(?, ?)', @$aref;
 
   IN:  'INSERT INTO mytable', $sref
-  OUT: 'INSERT INTO mytable VALUES(?)', $$sref; 
+  OUT: 'INSERT INTO mytable VALUES(?)', $$sref;
 
 MySQL's "REPLACE INTO" is supported the same way.
 
@@ -595,18 +595,18 @@ MySQL's "ON DUPLICATE KEY UPDATE" is supported the same way.
 
 =head3 Context ('FROM | JOIN', $x)
 
-I<This is not commonly used.> 
+I<This is not commonly used.>
 
   IN:  'SELECT * FROM', $vv
   OUT: 'SELECT * FROM
        (SELECT ?, ? UNION ALL SELECT ?, ?) as t001',
-       map {@$_} @$v      
+       map {@$_} @$v
 
   IN:  'SELECT * FROM', $vh
   OUT: 'SELECT * FROM
        (SELECT ? as m, ? as n UNION ALL SELECT ?, ?) as temp001',
        $vh->[0]->{m}, $vh->[0]->{n},
-       $vh->[1]->{m}, $vh->[1]->{n}  
+       $vh->[1]->{m}, $vh->[1]->{n}
 
   IN:  'SELECT * FROM', $vv, 'AS t'
   OUT: 'SELECT * FROM
@@ -727,7 +727,7 @@ all the variable references are transparently converted into sql_type
 objects, and the elements of @bind take a special form: an arrayref
 consisting of the bind value and the sql_type object that generated the
 bind value.  Note that a single sql_type holding an aggregate (arrayref
-or hashref) may generate multiple bind values.  
+or hashref) may generate multiple bind values.
 
 =head1 Enabling debugging output
 
@@ -760,7 +760,7 @@ In contrast, SQL::Interp does not abstract away your SQL but rather makes it
 easier to interpolate Perl variables into your SQL.  Now, SQL::Interp I<does>
 load some meaning into "{, "[" and "\", but we try to limit its use to obvious
 cases.  Since your raw SQL is exposed, you can use your particular dialect of
-SQL.  
+SQL.
 
 =head1 Limitations
 
@@ -770,9 +770,9 @@ generally robust.  Look at the examples to see the types of interpolation that
 are accepted, and if doubt, examine the SQL output yourself with the TRACE_SQL
 environment variable set.  If needed, you can disable context sensitivity by inserting a
 null-string before a variable.
- 
+
  "SET", "", \$x
- 
+
 A few things are just not possible with the ('WHERE', \%hashref)
 syntax, so in such case, use a more direct syntax:
 
