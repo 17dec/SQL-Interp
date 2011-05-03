@@ -10,10 +10,10 @@ BEGIN {require 't/lib.pl';}
 # test of use parameters
 BEGIN {
     use_ok('SQL::Interp',
-        ':all', TRACE_SQL => 0 ); # 0.3
+        ':all' ); # 0.3
 }
 
-my $interp = new SQL::Interp;
+my $interp = SQL::Interp->new;
 
 my $x = 5;
 my $y = 6;

@@ -11,6 +11,23 @@ A future release:
         "RT#39778: wish: optimize IN() to be ANY() for compatible PostgreSQL versions": 
          https://rt.cpan.org/Ticket/Display.html?id=39778
 
+1.11-TRIAL 2011-05-03
+    [THINGS THAT MIGHT BREAK YOUR CODE]
+    - This is no longer supported for enabling SQL tracing: 
+         SQL::Interp TRACE => 1;
+      You can still set $ENV{TRACE_SQL} = 1  to enable SQL tracing.
+
+    [FEATURES]
+    - Add sql_interp_strict() as a first stab at an API for adding a strict mode. 
+    - Switched to using Sub::Exporter and Exporter. This allows you to do this:
+
+      use SQL::Interp 'sql_interp_strict' { -as => 'sql_interp' };
+
+      So that strict mode is enabled throughout your code. Before you do that,
+      read the docs on sql_interp_strict-- some of your code may need to be
+      refactored for it work, so you may want to start with the incremental
+      approach.
+
 1.10 2009-06-28
 
     [FEATURES]

@@ -10,7 +10,7 @@ use DBI qw(:sql_types);
 
 my $dbh = DBI->connect('DBI:Mock:', '', '')
     or die "Cannot create handle: $DBI::errstr\n";
-my $dbx = new DBIx::Interp($dbh);
+my $dbx = DBIx::Interp->new($dbh);
 
 my @data1   = (['a', 'b'], ['c', 'd']);
 my @result1 = (['color', 'size'], @data1);
