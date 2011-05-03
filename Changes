@@ -1,17 +1,9 @@
 
-A future release:
-
-    - If you like SQL::Interp, please consider supporting the project by adding support
-      for the 'quote_char' and 'name_sep' options. SQL::Abstract has code that can be
-      borrowed for this. See this bug report for details:
-      http://rt.cpan.org/Public/Bug/Display.html?id=31488
-
-    - If you use SQL::Interp with PostgreSQL and are interested in a further
-      performance improvement, considering working on this optimization: 
-        "RT#39778: wish: optimize IN() to be ANY() for compatible PostgreSQL versions": 
-         https://rt.cpan.org/Ticket/Display.html?id=39778
-
 1.11-TRIAL 2011-05-03
+
+    I'm looking for feedback on the new "strict mode" before including it a stable release.
+    Contact: Mark Stosberg <mark@summersault.com> 
+
     [THINGS THAT MIGHT BREAK YOUR CODE]
     - This is no longer supported for enabling SQL tracing: 
          SQL::Interp TRACE => 1;
@@ -38,6 +30,12 @@ A future release:
       If you would like a shortcut for this in the form of SQL::Interp::Strict,
       let me know. 
 
+    [DOCUMENTATION]
+    - The documentation has been updated to clarify that DBIx::Simple's
+      SQL::Interp integration is recommended over DBIx::Interp.
+
+    - Noted that SQL::Interp now has the primary repo hosted on Github:
+      https://github.com/markstos/SQL-Interp
 
 1.10 2009-06-28
 

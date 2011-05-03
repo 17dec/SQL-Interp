@@ -466,19 +466,21 @@ SQL::Interp properly binds or escapes variables.  This recommended practice
 safeguards against "SQL injection" attacks. The L<DBI|DBI> documentation has
 several links on the topic.
 
-Besides the simple techniques shown above, The SQL-Interpolate distribution includes
-the optional L<DBIx::Interp|DBIx::Interp> module, which integrates with DBI:
+Besides the simple techniques shown above, The SQL::Interp integrates directly
+with L<DBIx::Simple|DBIx::Simple> for an excellent alternative to raw DBI access:
 
-  use DBIx::Interp ':all';
+  use DBIx::Simple;
+
   ...
-  my $rows = $dbx->selectall_arrayref("
+
+  my $rows = $db->iquery("
       SELECT title
           FROM threads
           WHERE date > ",\$x," AND subject IN ",\@subjects
-   );
+   )->arrays;
 
-Since DBIx::Interp still allows you complete access to the DBI API, using it
-as wrapper is recommended for most applications.
+Since DBIx::Simple still allows you complete access to the DBI API, using it as
+wrapper is recommended for most applications.
 
 =head1 The One Function You Really Need
 
@@ -615,23 +617,6 @@ I<This is not commonly used.>
 
   # Example usage (where $x and $y are table references):
   'SELECT * FROM', $x, 'JOIN', $y
-
-=head3 Preparing and reusing a statement handle
-
-The following code reuses a statement handle and even reprepares the statement
-handle if the SQL changes.  L<DBIx::Interp> provides a streamlined solution
-that transparently caches statement handles.
-
-  my $sth;
-  for my $href (@array_of_hashrefs) {
-     my @list = ('SELECT * FROM mytable WHERE', $href);
-     my ($sql, @bind) = sql_interp @list;
-     if (! defined $sth || $sth->{Statement} ne $sql) {
-         $sth = $dbh->prepare($sql);
-     }
-     $sth->execute(@bind);
-     $sth->fetchall_arrayref();
-  }
 
 =head3 Other Rules
 
@@ -786,13 +771,27 @@ In the cases where this module parses or generates SQL fragments, this module
 should work for many databases, but its been tested mostly on MySQL and
 PostgreSQL.  Please inform the author of any incompatibilities.
 
-=head1 Contributors
+=head1 Contributor and Contributing
 
 David Manura (L<http://math2.org/david/contact>) (author).
 Mark Stosberg (L<http://mark.stosberg.com/>) created and maintains
 the SQL::Interp fork. Also thanks to: Mark Tiefenbruck (syntax), Wojciech Pietron (Oracle
 compat), Jim Chromie (DBIx::Interp idea), Juerd Waalboer,
 Terrence Brannon (early feedback), and others.
+
+If you like SQL::Interp, please consider supporting the project by adding
+support for the 'quote_char' and 'name_sep' options. SQL::Abstract has code
+that can be borrowed for this. See this bug report for details:
+http://rt.cpan.org/Public/Bug/Display.html?id=31488
+
+If you use SQL::Interp with PostgreSQL and are interested in a further
+performance improvement, considering working on this optimization: "RT#39778:
+wish: optimize IN() to be ANY() for compatible PostgreSQL versions":
+https://rt.cpan.org/Ticket/Display.html?id=39778
+
+SQL::Interp now has a code repository hosted on Github:
+
+ L<https://github.com/markstos/SQL-Interp>
 
 =head1 Bug Reporting
 
@@ -840,7 +839,8 @@ used it for years without those optional features and never missed them.
 
 L<DBIx::Interp|DBIx::Interp> allows DBI methods to accept an
 C<sql_interp()>-like interpolation list rather than the traditional
-($statement, \%attr, @bind_values) parameter list.
+($statement, \%attr, @bind_values) parameter list. However, consider
+using L<DBIx::Simple|DBIx::Simple> instead-- it even more user friendly.
 
 =head2 Related modules
 

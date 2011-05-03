@@ -462,6 +462,9 @@ unfamiliar with them.  The DBIx::Interp interface adds methods to the DBI
 interface with an "_i" suffix, indicating that SQL::Interp interpolatation is performed
 in these cases.
 
+I< Note that this module is no longer used by the maintainer. DBIx::Simple now features SQL::Interp
+integration and is the recommended alternative. >
+
 =head1 Helper Functions you may need
 
 =head2 C<attr>
