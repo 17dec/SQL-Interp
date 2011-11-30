@@ -1,6 +1,6 @@
 package SQL::Interp;
 
-our $VERSION = '1.11';
+our $VERSION = '1.20';
 
 use strict;
 use warnings;
