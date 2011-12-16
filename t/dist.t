@@ -1,19 +1,25 @@
 # test various aspects of the distribution
 
+#!/usr/bin/env perl -T
+
 use strict;
-use Test::More 'no_plan';
+use warnings;
+
+use Test::More tests => 1;
 
 # list of all modules
 my @modules = (
     'SQL::Interp',
-    'DBIx::Interp'
+    'DBIx::Interp',
 );
 
 my %version_exist;
 for my $module (@modules) {
     eval "require $module";
+    next if $@;
     my $version = $module->VERSION;
     $version_exist{$version} = 1;
 }
-ok(keys %version_exist == 1, 'module versions match');
+
+ok(scalar keys %version_exist == scalar @modules, 'module versions match');
 
