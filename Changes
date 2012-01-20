@@ -1,4 +1,10 @@
 
+1.21 2012-01-20
+    No code changes.
+
+    [INTERNALS]
+    - Sync'ed version of DBIx::Interp and SQL::Interp to avoid test failure (RT#73756)
+
 1.20 2011-11-30
 
     No changes since 1.11-TRIAL. Releasing as stable.
