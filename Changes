@@ -1,4 +1,10 @@
 
+1.22 2013-08-10
+    No code changes.
+
+    [INTERNALS]
+    - Updated test suite to pass with Perl 5.18 hash randomization.  (Mark Stosberg)
+
 1.21 2012-01-20
     No code changes.
 
@@ -10,9 +16,6 @@
     No changes since 1.11-TRIAL. Releasing as stable.
 
 1.11-TRIAL 2011-05-03
-
-    I'm looking for feedback on the new "strict mode" before including it a stable release.
-    Contact: Mark Stosberg <mark@summersault.com> 
 
     [THINGS THAT MIGHT BREAK YOUR CODE]
     - This is no longer supported for enabling SQL tracing: 

@@ -100,8 +100,8 @@ is_deeply($stx->sth()->{mock_params}, [4, 5, 6, 7]);
 is(scalar(keys %{$stx->sths()}), 2, 'two sths in stx still');
 
 my $h2 = {a => 1, b => 2};
-my $h2_keys = [keys %$h2];
-my $h2_values = [values %$h2];
+my $h2_keys = [sort keys %$h2];
+my $h2_values = [map {$h2->{$_}} sort keys %$h2];
 
 # bind_param
 $dbh->{mock_clear_history} = 1;
@@ -113,8 +113,7 @@ $dbx->selectall_arrayref_i("SELECT * FROM mytable WHERE x=", \$x,
 );
 is_deeply(
     $dbh->{mock_all_history}->[0]{statement},
-    "SELECT * FROM mytable WHERE x= ? AND y= ? AND " .
-    "($h2_keys->[0]=? AND $h2_keys->[1]=?) AND x IN (?, ?)"
+    "SELECT * FROM mytable WHERE x= ? AND y= ? AND "."($h2_keys->[0]=? AND $h2_keys->[1]=?) AND x IN (?, ?)"
 );
 # note: DBD::Mock doesn't save bind param type to test?
 

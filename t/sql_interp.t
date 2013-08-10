@@ -42,11 +42,11 @@ sub make_hash_info {
     my ($hashref, $place_of, $bind_of) = @_;
     my $info = {
         hashref => $hashref,
-        keys    => [ keys %$hashref             ],
-        values  => [ values %$hashref           ],
-        places  => [ @$place_of{keys %$hashref} ],
+        keys    => [ sort keys %$hashref ],
+        values  => [ map { $hashref->{$_} } sort keys %$hashref ],
+        places  => [ @$place_of{sort keys %$hashref} ],
         binds   => [ map {defined $_ ? @$_ : ()}
-                         @$bind_of{ grep { exists $bind_of->{$_} } keys %$hashref} ]
+                         @$bind_of{ grep { exists $bind_of->{$_} } sort keys %$hashref} ]
     };
     return $info;
 }
@@ -121,8 +121,8 @@ interp_test(['INSERT INTO mytable', $h],
                  @{$hi->{values}}],
             'INSERT hashref of size > 0');
 interp_test(['INSERT INTO mytable', $h2i->{hashref}],
-            ["INSERT INTO mytable ($h2i->{keys}[1], $h2i->{keys}[0], $h2i->{keys}[2]) " .
-             "VALUES($h2i->{places}->[1], $h2i->{places}->[0],  $h2i->{places}->[2])",
+            ["INSERT INTO mytable ($h2i->{keys}[0], $h2i->{keys}[1], $h2i->{keys}[2]) " .
+             "VALUES($h2i->{places}->[0], $h2i->{places}->[1],  $h2i->{places}->[2])",
              @{$h2i->{binds}}],
             'INSERT hashref of sql_type + sql()');
 interp_test(['INSERT INTO mytable', {one => 1, two => sql(\$x, '*', \$x)}],
@@ -202,7 +202,7 @@ my $h2bi = make_hash_info(
     {x => [1]}
 );
 interp_test(['WHERE', $h2bi->{hashref}],
-            ["WHERE ($h2bi->{places}[1] AND $h2bi->{places}[0])", @{$h2bi->{binds}}],
+            ["WHERE ($h2bi->{places}[0] AND $h2bi->{places}[1])", @{$h2bi->{binds}}],
             'WHERE hashref sql()');
 my $h2ci = make_hash_info(
     {x => 1, y => undef},
@@ -210,7 +210,7 @@ my $h2ci = make_hash_info(
     {x => [1]}
 );
 interp_test(['WHERE', $h2ci->{hashref}],
-            ["WHERE ($h2ci->{places}[1] AND $h2ci->{places}[0])", @{$h2ci->{binds}}],
+            ["WHERE ($h2ci->{places}[0] AND $h2ci->{places}[1])", @{$h2ci->{binds}}],
             'WHERE hashref of NULL');
 
 # WHERE x=
@@ -235,7 +235,7 @@ my $h5i = make_hash_info(
     {x => [[$x, sql_type(\$x)]], y => [[3, sql_type(\3)], [${$var2->{value}}, $var2]]}
 );
 interp_test(['WHERE', $h5i->{hashref}],
-            ["WHERE ($h5i->{places}[1] AND $h5i->{places}[0])", @{$h5i->{binds}}[2,0,1]],
+            ["WHERE ($h5i->{places}[0] AND $h5i->{places}[1])", @{$h5i->{binds}}[0,1,2]],
             'WHERE hashref of arrayref of sql_type typed');
 interp_test(['WHERE', {x => $x, y => sql('z')}],
             ['WHERE (x=? AND y=z)', $x],

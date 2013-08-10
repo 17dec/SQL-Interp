@@ -11,7 +11,7 @@ my @modules = (
 
 my %version_exist;
 for my $module (@modules) {
-    eval "require $module";
+    eval "require $module" || die $@;
     my $version = $module->VERSION;
     $version_exist{$version} = 1;
 }
