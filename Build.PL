@@ -17,4 +17,9 @@ Module::Build->new(
     },
     create_makefile_pl  => 'traditional',
     dist_author => [ 'David Manura (http://math2.org/david/contact)' , 'Mark Stosberg <mark@summersault.com>' ],
+    meta_merge => {
+        resources => {
+            repository => 'https://github.com/markstos/SQL-Interp',
+        },
+    },
 )->create_build_script();
