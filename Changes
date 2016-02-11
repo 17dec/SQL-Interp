@@ -1,4 +1,10 @@
 
+1.23 2016-02-11
+  No code changes.
+
+  [INTERNALS]
+  - Correct link to license in README.  (Mark Stosberg) [rt.cpan.org #111948] 
+
 1.22 2013-08-10
     No code changes.
 
