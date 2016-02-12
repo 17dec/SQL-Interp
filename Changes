@@ -1,4 +1,11 @@
 
+1.24 2016-02-11
+  No code changes.
+
+  [INTERNALS]
+  - Fixed t/dist.t test failure due to version mismatch in 1.23.
+
+
 1.23 2016-02-11
   No code changes.
 
