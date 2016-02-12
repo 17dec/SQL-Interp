@@ -15,7 +15,7 @@ use Sub::Exporter -setup => {
     ],
 };
 
-our $VERSION = '1.22';
+our $VERSION = '1.24';
 
 our @CARP_NOT =
     qw(DBIx::Interp DBIx::Interp::db DBIx::Interp::STX);
