@@ -181,6 +181,21 @@ sub _sql_interp {
                     _error_item($idx, \@items);
                 }
             }
+            elsif ($sql =~ /\bARRAY\s*$/si) {
+                $item = [ $$item ] if ref $item eq 'SCALAR';
+
+                # allow double references
+                $item = $$item if ref $item eq 'REF' ;
+
+                if (ref $item eq 'ARRAY') {
+                    $sql .= '[' . join(', ', map {
+                        _sql_interp_data($_);
+                    } @$item) . ']';
+                }
+                else {
+                    _error_item($idx, \@items);
+                }
+            }
             elsif ($sql =~ /\b(?:ON\s+DUPLICATE\s+KEY\s+UPDATE|SET)\s*$/si && ref $item eq 'HASH') {
                 _error('Hash has zero elements.') if keys %$item == 0;
                 $sql .= " " . join(', ', map {
@@ -617,6 +632,19 @@ I<This is not commonly used.>
 
   # Example usage (where $x and $y are table references):
   'SELECT * FROM', $x, 'JOIN', $y
+
+=head3 Context ('ARRAY', $x)
+
+A scalarref or arrayref can be turned into an array value. Such values are supported by PostgreSQL.
+
+  IN:  'SELECT ARRAY', $aref
+  OUT: 'SELECT ARRAY[?, ?]', @$aref
+
+  IN:  'SELECT ARRAY', $sref
+  OUT: 'SELECT ARRAY[?]', $$sref
+
+  IN:  'SELECT ARRAY', []
+  OUT: 'SELECT ARRAY[]'
 
 =head3 Other Rules
 
